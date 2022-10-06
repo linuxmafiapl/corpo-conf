@@ -1,0 +1,36 @@
+{
+    "policy_id": "index_state_policy_delete_v2",
+    "description": "Delete indices with hot state.",
+    "last_updated_time": 1649865808431,
+    "schema_version": 1,
+    "error_notification": null,
+    "default_state": "hot",
+    "states": [
+        {
+            "name": "hot",
+            "actions": [
+                {
+                    "read_only": {}
+                }
+            ],
+            "transitions": [
+                {
+                    "state_name": "delete",
+                    "conditions": {
+                        "min_index_age": "1d"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "delete",
+            "actions": [
+                {
+                    "delete": {}
+                }
+            ],
+            "transitions": []
+        }
+    ],
+    "ism_template": null
+}
