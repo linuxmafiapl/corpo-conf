@@ -1,0 +1,18 @@
+add-apt-repository ppa:oisf/suricata-stable
+export OSQUERY_KEY=1484120AC4E9F8A1A577AEEE97A80C63C9D8B80B
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys $OSQUERY_KEY
+add-apt-repository 'deb [arch=amd64] https://pkg.osquery.io/deb deb main'
+apt-get update
+
+cd /home/tick/
+git clone git@github.com:linuxmafiapl/corpo-conf.git
+apt-get install osquery suricata auditd audispd-plugins
+systemctl stop suricata
+cd corpo-conf/osquery/
+cp -a * /etc/osquery/
+systemctl enable --now osqueryd.service
+cat /home/tick/corpo-conf/auditd/audit.rules > audit.rules
+/etc/init.d/auditd start
+systemctl enable --now auditd
+suricata-update update-sources && suricata-update --no-test
+systemctl restart wazuh-agent
