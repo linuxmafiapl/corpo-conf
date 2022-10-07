@@ -1,0 +1,107 @@
+app-layer:
+  protocols:
+    krb5:
+      enabled: yes
+
+    ikev2:
+      enabled: yes
+
+    tls:
+      enabled: yes
+      detection-ports:
+        dp: 443, 6443, 9300
+
+      ja3-fingerprints: yes
+      encrypt-handling: full
+
+    dcerpc:
+      enabled: yes
+
+    ftp:
+      enabled: yes
+
+    ssh:
+      enabled: yes
+
+    smtp:
+      enabled: yes
+      mime:
+        decode-mime: yes
+        decode-base64: yes
+        decode-quoted-printable: yes
+        header-value-depth: 2000
+        extract-urls: yes
+        body-md5: yes
+
+      inspected-tracker:
+        content-limit: 100000
+        content-inspect-min-size: 32768
+        content-inspect-window: 4096
+
+    imap:
+      enabled: yes
+
+    msn:
+      enabled: yes
+
+    smb:
+      enabled: yes
+      detection-ports:
+        dp: 139, 445
+
+    nfs:
+      enabled: yes
+
+    tftp:
+      enabled: yes
+
+    dns:
+      request-flood: 500
+
+      tcp:
+        enabled: yes
+        detection-ports:
+          dp: 53
+      udp:
+        enabled: yes
+        detection-ports:
+          dp: 53
+
+    http:
+      enabled: yes
+
+      libhtp:
+        default-config:
+          personality: IDS
+
+          request-body-limit: 100kb
+          response-body-limit: 100kb
+          request-body-minimal-inspect-size: 32kb
+          request-body-inspect-window: 4kb
+          response-body-minimal-inspect-size: 40kb
+          response-body-inspect-window: 16kb
+
+          response-body-decompress-layer-limit: 2
+          http-body-inline: auto
+
+          swf-decompression:
+            enabled: yes
+            type: both
+            compress-depth: 0
+            decompress-depth: 0
+
+          double-decode-path: no
+          double-decode-query: no
+
+        server-config:
+
+    dnp3:
+      enabled: yes
+      detection-ports:
+        dp: 20000
+
+    ntp:
+      enabled: yes
+
+    dhcp:
+      enabled: yes
