@@ -4,15 +4,25 @@ apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys $OSQUERY_KEY
 add-apt-repository 'deb [arch=amd64] https://pkg.osquery.io/deb deb main'
 apt-get update
 
-cd /home/tick/
+cd ~/
 git clone git@github.com:linuxmafiapl/corpo-conf.git
 apt-get install osquery suricata auditd audispd-plugins
 systemctl stop suricata
 cd corpo-conf/osquery/
 cp -a * /etc/osquery/
 systemctl enable --now osqueryd.service
-cat /home/tick/corpo-conf/auditd/audit.rules > audit.rules
+cat ~/corpo-conf/auditd/audit.rules > audit.rules
 /etc/init.d/auditd start
 systemctl enable --now auditd
 suricata-update update-sources && suricata-update --no-test
 systemctl restart wazuh-agent
+
+curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import && \
+chmod 644 /usr/share/keyrings/wazuh.gpg
+echo "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main" | tee -a /etc/apt/sources.list.d/wazuh.list
+apt update
+WAZUH_MANAGER="$MANAGER_IP" apt install -y wazuh-agent
+echo -e "sca.remote_commands=1\nwazuh_command.remote_commands=1\nlogcollector.remote_commands=1\nlogcollector.queue_size=10000" > /var/ossec/etc/local_internal_options.conf
+sed -i "\$i \ \ <localfile>\n \ \ \ <log_format>syslog</log_format>\n \ \ \ <location>/var/log/*.log</location>\n \ </localfile>\n" /var/ossec/etc/ossec.conf
+./var/ossec/bin/wazuh-control restart
+
