@@ -1,0 +1,29 @@
+yum install -y yum-utils epel-release wget jq
+curl -L https://pkg.osquery.io/rpm/GPG | tee /etc/pki/rpm-gpg/RPM-GPG-KEY-osquery
+curl -L https://copr.fedorainfracloud.org/coprs/jasonish/suricata-6.0/repo/epel-7/jasonish-suricata-6.0-epel-7.repo | tee /etc/yum.repos.d/suricata-6.0-epel-7.repo
+yum-config-manager --add-repo https://pkg.osquery.io/rpm/osquery-s3-rpm.repo
+yum-config-manager --enable osquery-s3-rpm-repo
+rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH
+echo -e '[wazuh]\ngpgcheck=1\ngpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZUH\nenabled=1\nname=EL-$releasever - Wazuh\nbaseurl=https://packages.wazuh.com/4.x/yum/\nprotect=1' | tee /etc/yum.repos.d/wazuh.repo
+
+yum install -y osquery auditd suricata wazuh-agent
+
+cd ~/
+git clone git@github.com:linuxmafiapl/corpo-conf.git
+systemctl stop suricata
+cd corpo-conf/osquery/
+cp -a * /etc/osquery/
+cat ~/corpo-conf/auditd/audit.rules > audit.rules
+/etc/init.d/auditd start
+suricata-update update-sources && suricata-update --no-test
+
+WAZUH_MANAGER="$MANAGER_IP" apt install -y wazuh-agent
+echo -e "sca.remote_commands=1\nwazuh_command.remote_commands=1\nlogcollector.remote_commands=1\nlogcollector.queue_size=10000" > /var/ossec/etc/local_internal_options.conf
+sed -i "\$i \ \ <localfile>\n \ \ \ <log_format>syslog</log_format>\n \ \ \ <location>/var/log/*.log</location>\n \ </localfile>\n" /var/ossec/etc/ossec.conf
+./var/ossec/bin/wazuh-control restart
+
+systemctl daemon-reload
+systemctl enable --now suricata
+systemctl enable --now wazuh-agent
+systemctl enable --now auditd
+systemctl enable --now osqueryd
