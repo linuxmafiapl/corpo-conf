@@ -1,0 +1,20 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: wazuh-nginx-ingress-https
+  namespace: wazuh
+  labels:
+    app: wazuh-nginx
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/custom-response-headers: "Access-Control-Allow-Origin:*||Access-Control-Allow-Methods:GET,POST,OPTIONS||Access-Control-Allow-Headers:DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range||Access-Control-Expose-Headers:Content-Length,Content-Range"
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: HostSNI(`wazuh.kube.local`)
+      services:
+        - name: wazuh-nginx-service
+          port: 443
+  tls:
+    passthrough: true

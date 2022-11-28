@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wazuh-nginx-deployment
+  namespace: wazuh
+  labels:
+    app: wazuh-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wazuh-nginx
+  template:
+    metadata:
+      labels:
+        app: wazuh-nginx
+    spec:
+      containers:
+      - name: wazuh-nginx
+        image: nginx:1.22.1-alpine
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 80
+            protocol: TCP
+          - containerPort: 443
+            protocol: TCP
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 512Mi
+        volumeMounts:
+          - name: nginx-configuration
+            mountPath: /etc/nginx/nginx.conf
+            subPath: nginx.conf
+          - name: application-configuration
+            mountPath: /etc/nginx/nginx.d/app.conf
+            subPath: app.conf
+          - name: application-cert-key
+            mountPath: /etc/nginx/ssl/cert-ext.key
+            subPath: cert-ext.key
+          - name: application-cert-pem
+            mountPath: /etc/nginx/ssl/cert-ext.pem
+            subPath: cert-ext.pem
+          - name: application-root-pem
+            mountPath: /etc/nginx/ssl/root-ca.pem
+            subPath: root-ca.pem
+      volumes:
+        - name: nginx-configuration
+          secret:
+            secretName: wazuh-nginx-secret
+        - name: application-configuration
+          secret:
+            secretName: wazuh-nginx-secret
+        - name: application-cert-key
+          secret:
+            secretName: wazuh-rp-ext-certs
+        - name: application-cert-pem
+          secret:
+            secretName: wazuh-rp-ext-certs
+        - name: application-root-pem
+          secret:
+            secretName: wazuh-rp-ext-certs

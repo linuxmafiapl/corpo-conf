@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wazuh-nginx-service
+  namespace: wazuh
+spec:
+  selector:
+    app: wazuh-nginx
+  ports:
+    - name: wazuh-nginx-http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: wazuh-nginx-https
+      protocol: TCP
+      port: 443
+      targetPort: 443
