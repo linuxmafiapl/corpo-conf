@@ -1,6 +1,6 @@
 apt update 
 apt install -y gnupg2 gnupg gnupg1 curl 
-apt install -y apt-transport-https lsb-release net-tools procps iputils-ping
+apt install -y apt-transport-https lsb-release net-tools procps iputils-ping software-properties-common
 
 add-apt-repository ppa:oisf/suricata-stable
 export OSQUERY_KEY=1484120AC4E9F8A1A577AEEE97A80C63C9D8B80B

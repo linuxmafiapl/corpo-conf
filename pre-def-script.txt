@@ -1,0 +1,28 @@
+# Linux Overview
+export PS1="\[\e[36;1m\]\u@\[\e[32;1m\]\H> \[\e[0m\]"
+uname
+uptime
+df
+free
+ps a
+lspci
+vmstat
+
+# Green Text
+export PS1="\[\e[36;1m\]\u@\[\e[32;1m\]\H> \[\e[0m\]"
+
+# Windows Flush DNS
+ipconfig /flushdns
+
+# Windows Install date
+systeminfo | find /i "install date"
+
+# Windows Install Malwarebytes mbam-setup.exe
+%RESOURCE_FILE%  /SP /SILENT /NOCANCEL
+
+# MAC Overview
+export PS1="\[\e[36;1m\]\u@\[\e[32;1m\]\H> \[\e[0m\]"
+uname
+uptime
+df
+ps a
